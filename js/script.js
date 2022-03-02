@@ -9,10 +9,9 @@ const btnPlayAgain = document.querySelector(".play-again");
 
 let word = "magnolia";
 let alreadyGuessed = [];
+let remainingGuesses = 8;
 
-//Create and name a function to update the paragraph’s innerText for the “words-in-progress” element with circle symbols (●) to represent each letter in the word. The symbols will stay on the screen until the correct letter is guessed (in a future step). Hint: Copy and paste the ● symbol into your code!
 
-//Call the function and pass it the word variable as the argument. You should see 8 circle symbols on the screen, one for each letter in the word “magnolia.” Hint: You’ll need to use an array and then join it back to a string using the .join("") method.
 
 const wordCircles = function (theWord) {
     wordInProgress.innerText = "";
@@ -25,6 +24,19 @@ const wordCircles = function (theWord) {
 }
 
 wordCircles(word);
+
+const getWord = async function () {
+    const wordLink = await fetch('https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt');
+    const words = await wordLink.text();
+
+    const wordArray = words.split("\n");
+
+    const randomIndex = Math.floor(Math.random() * wordArray.length);
+
+    word = wordArray[randomIndex].trim();
+
+    wordCircles(word);
+}
 
 btnGuess.addEventListener("click", function (e) {
     e.preventDefault();
@@ -44,7 +56,6 @@ const validateInput = function (input) {
     } else {
         message.innerText = "";
         makeGuess(input);
-        
     }
 }
 
@@ -55,7 +66,15 @@ const makeGuess = function (input) {
     } else {
         alreadyGuessed.push(ltr);
         displayGuesses();
-        revealLetter(ltr);
+        const ltrExists = revealLetter(ltr);
+
+        if (ltrExists) {
+            message.innerText = "You've entered a matching letter!";
+            didYouWin();
+        } else {
+            countGuess(ltr);
+        }
+        
     }
 }
 
@@ -72,15 +91,33 @@ const revealLetter = function (ltr) {
     //wordInProgress
     const wordUpper = word.toUpperCase().split("");
     let circleWord = wordInProgress.innerText.split("");
+    let trigger = false;
     wordUpper.forEach(function (letter, index) {
         if (letter === ltr) {
             circleWord[index] = ltr;
+            trigger = true;
         }
     })
 
     wordInProgress.innerText = circleWord.join("");
+    
+    //didYouWin();
 
-    didYouWin();
+    return trigger;
+}
+
+const countGuess = function (input) {
+    const wordUpper = word.toUpperCase().split("");
+    if (!wordUpper.includes(input)) {
+        remainingGuesses -= 1;
+        numGuesses.innerText = remainingGuesses;
+        if (remainingGuesses === 0) {
+            message.innerText = `Oops! You lose! The word was ${word.toUpperCase()}.`;
+            getWord();
+        } else {
+            message.innerText = `That is not a matching letter. You are running out of guesses!`;
+        }
+    }
 }
 
 const didYouWin = function () {
@@ -90,6 +127,7 @@ const didYouWin = function () {
     if (wordUpper === circleWord) {
         message.innerText = "You guessed the correct word! Congrats!";
         message.classList.add("win");
+        getWord();
     }
 }
 
