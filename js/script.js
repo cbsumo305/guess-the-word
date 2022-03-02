@@ -6,10 +6,13 @@ const remaining = document.querySelector(".remaining");
 const numGuesses = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 const btnPlayAgain = document.querySelector(".play-again");
+const guessForm = document.querySelector(".guess-form-box");
 
 let word = "magnolia";
 let alreadyGuessed = [];
 let remainingGuesses = 8;
+
+
 
 
 
@@ -35,7 +38,19 @@ const getWord = async function () {
 
     word = wordArray[randomIndex].trim();
 
+    remainingGuesses = word.length;
+    numGuesses.innerText = remainingGuesses;
+
     wordCircles(word);
+}
+
+const startOver = function () {
+    btnGuess.classList.add("hide");
+    remaining.classList.add("hide");
+    guessedLetters.classList.add("hide");
+    guessForm.classList.add("hide");
+
+    btnPlayAgain.classList.remove("hide");
 }
 
 btnGuess.addEventListener("click", function (e) {
@@ -113,7 +128,7 @@ const countGuess = function (input) {
         numGuesses.innerText = remainingGuesses;
         if (remainingGuesses === 0) {
             message.innerText = `Oops! You lose! The word was ${word.toUpperCase()}.`;
-            getWord();
+            startOver();
         } else {
             message.innerText = `That is not a matching letter. You are running out of guesses!`;
         }
@@ -127,7 +142,24 @@ const didYouWin = function () {
     if (wordUpper === circleWord) {
         message.innerText = "You guessed the correct word! Congrats!";
         message.classList.add("win");
-        getWord();
+        startOver();
     }
 }
+
+btnPlayAgain.addEventListener("click", function () {
+    message.classList.remove("win");
+    message.innerText = "";
+    guessedLetters.innerHTML = "";
+    
+    alreadyGuessed = [];
+    
+
+    getWord();
+
+    btnGuess.classList.remove("hide");
+    remaining.classList.remove("hide");
+    guessedLetters.classList.remove("hide");
+    guessForm.classList.remove("hide");
+    btnPlayAgain.classList.add("hide");
+})
 
