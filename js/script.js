@@ -44,6 +44,7 @@ const validateInput = function (input) {
     } else {
         message.innerText = "";
         makeGuess(input);
+        
     }
 }
 
@@ -53,6 +54,42 @@ const makeGuess = function (input) {
         message.innerText = "You already guessed that letter, silly. Try again.";
     } else {
         alreadyGuessed.push(ltr);
+        displayGuesses();
+        revealLetter(ltr);
+    }
+}
+
+const displayGuesses = function () {
+    guessedLetters.innerHTML = "";
+    for (let guess of alreadyGuessed) {
+        let li = document.createElement("li");
+        li.innerText = guess;
+        guessedLetters.append(li);
+    }
+}
+
+const revealLetter = function (ltr) {
+    //wordInProgress
+    const wordUpper = word.toUpperCase().split("");
+    let circleWord = wordInProgress.innerText.split("");
+    wordUpper.forEach(function (letter, index) {
+        if (letter === ltr) {
+            circleWord[index] = ltr;
+        }
+    })
+
+    wordInProgress.innerText = circleWord.join("");
+
+    didYouWin();
+}
+
+const didYouWin = function () {
+    const wordUpper = word.toUpperCase();
+    const circleWord = wordInProgress.innerText;
+
+    if (wordUpper === circleWord) {
+        message.innerText = "You guessed the correct word! Congrats!";
+        message.classList.add("win");
     }
 }
 
