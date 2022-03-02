@@ -142,6 +142,7 @@ const didYouWin = function () {
     if (wordUpper === circleWord) {
         message.innerText = "You guessed the correct word! Congrats!";
         message.classList.add("win");
+        message.classList.add("highlight");
         startOver();
     }
 }
